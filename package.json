@@ -7,7 +7,7 @@
     "start": "node ./dist/server.js",
     "dev": "nodemon -x ts-node src/server.ts",
     "push_github": "git checkout main && git merge master && git push github main && git checkout master",
-    "heroku": "heroku logs --tail --app devbox-api"
+    "heroku": "heroku logs --tail --app my-skin-api"
   },
   "keywords": [],
   "author": "",
