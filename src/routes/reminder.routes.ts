@@ -5,12 +5,12 @@ import { verifyJWT } from "../services/user.service";
 const reminderRouter = express.Router();
 
 reminderRouter.get(
-  "/all/:userId",
+  "/all",
   verifyJWT,
   reminderController.getAllRemindersByUserId
 );
 reminderRouter.get(
-  "/all/:userEmail",
+  "/all",
   verifyJWT,
   reminderController.getAllRemindersByUserEmail
 );

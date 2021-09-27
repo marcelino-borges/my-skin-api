@@ -16,7 +16,7 @@ export const getAllRemindersByUserId = async (
   next: any
 ) => {
   try {
-    const userId: string = req.params.id as string;
+    const userId: string = req.query.id as string;
 
     if (!userId)
       return res.status(400).json(new AppError(MISSING_USER_ID, 400));
@@ -44,7 +44,7 @@ export const getAllRemindersByUserEmail = async (
   next: any
 ) => {
   try {
-    const userEmail: string = req.params.userEmail as string;
+    const userEmail: string = req.query.userEmail as string;
 
     if (!userEmail)
       return res.status(400).json(new AppError(MISSING_USER_EMAIL, 400));
