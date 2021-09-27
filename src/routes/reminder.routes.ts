@@ -9,11 +9,6 @@ reminderRouter.get(
   verifyJWT,
   reminderController.getAllRemindersByUserId
 );
-reminderRouter.get(
-  "/all",
-  verifyJWT,
-  reminderController.getAllRemindersByUserEmail
-);
 reminderRouter.post("/", verifyJWT, reminderController.createReminder);
 reminderRouter.put("/", verifyJWT, reminderController.updateReminder);
 reminderRouter.delete("/", verifyJWT, reminderController.deleteReminder);

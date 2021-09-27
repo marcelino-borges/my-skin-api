@@ -3,6 +3,7 @@ import AppError, {
   ERROR_CREATE_REMINDER,
   ERROR_DELETE_REMINDER,
   ERROR_UPDATE_REMINDER,
+  INVALID_QUERY,
   INVALID_REQUEST,
   MISSING_USER_EMAIL,
   MISSING_USER_ID,
@@ -18,8 +19,7 @@ export const getAllRemindersByUserId = async (
   try {
     const userId: string = req.query.userId as string;
 
-    if (!userId)
-      return res.status(400).json(new AppError(MISSING_USER_ID, 400));
+    if (!userId) return await getAllRemindersByUserEmail(req, res, next);
 
     const remindersFound: IUserReminders = await reminder
       .findOne({ userId })
@@ -47,7 +47,7 @@ export const getAllRemindersByUserEmail = async (
     const userEmail: string = req.query.userEmail as string;
 
     if (!userEmail)
-      return res.status(400).json(new AppError(MISSING_USER_EMAIL, 400));
+      return res.status(400).json(new AppError(INVALID_QUERY, 400));
 
     const remindersFound: IUserReminders = await reminder
       .findOne({ email: userEmail })
