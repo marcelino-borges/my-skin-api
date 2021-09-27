@@ -73,3 +73,6 @@ bower_components
 /*.env
 .DS_Store
 npm-debug.log
+
+# Archives
+/[Aa]rchives
