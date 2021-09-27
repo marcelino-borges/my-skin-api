@@ -5,7 +5,9 @@ import userRouter from "./routes/user.routes";
 import reminderRouter from "./routes/reminder.routes";
 import dotenvSafe from "dotenv-safe";
 
-dotenvSafe.config();
+dotenvSafe.config({
+  allowEmptyValues: true,
+});
 
 const PORT = parseInt(process.env.PORT as string, 10);
 
