@@ -13,8 +13,8 @@ export interface IReminder {
   description: string;
   active: boolean;
   nextAlarm: Date;
-  repeat: ReminderRepeat;
-  daysOfWeekToAlarm: DaysOfWeek;
+  repeat?: ReminderRepeat;
+  daysOfWeekToAlarm?: DaysOfWeek;
 }
 
 enum ReminderRepeat {
@@ -44,7 +44,7 @@ const schema = new Schema<IUserReminders>(
         description: { type: String, require: true },
         active: { type: Boolean, require: true },
         nextAlarm: { type: Date, require: true },
-        repeat: { type: ReminderRepeat, require: true },
+        repeat: { type: ReminderRepeat },
         daysOfWeek: { type: Array },
       },
     },
