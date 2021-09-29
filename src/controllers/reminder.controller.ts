@@ -1,20 +1,15 @@
 import { Request, Response } from "express";
 import * as reminderService from "../services/reminder.service";
 
-export const getAllRemindersByUserId = async (
+export const getAllRemindersByQuery = async (
   req: Request,
   res: Response,
   next: any
 ) => {
-  return reminderService.getAllRemindersByUserId(req, res, next);
-};
-
-export const getAllRemindersByUserEmail = async (
-  req: Request,
-  res: Response,
-  next: any
-) => {
-  return reminderService.getAllRemindersByUserEmail(req, res, next);
+  if (req.query.userId)
+    return reminderService.getAllRemindersByUserId(req, res, next);
+  else if (req.query.userEmail)
+    return reminderService.getAllRemindersByUserEmail(req, res, next);
 };
 
 export const createReminder = async (

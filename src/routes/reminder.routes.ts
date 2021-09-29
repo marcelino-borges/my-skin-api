@@ -7,7 +7,7 @@ const reminderRouter = express.Router();
 reminderRouter.get(
   "/all",
   verifyJWT,
-  reminderController.getAllRemindersByUserId
+  reminderController.getAllRemindersByQuery
 );
 reminderRouter.post("/", verifyJWT, reminderController.createReminder);
 reminderRouter.put("/", verifyJWT, reminderController.updateReminder);

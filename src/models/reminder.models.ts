@@ -34,24 +34,29 @@ enum DaysOfWeek {
   saturday,
 }
 
-const schema = new Schema<IUserReminders>(
+const reminderSchema = new Schema<IReminder>(
   {
-    userId: { type: String, require: true },
-    email: { type: String, require: true },
-    reminders: {
-      type: {
-        title: { type: String, require: true },
-        description: { type: String, require: true },
-        active: { type: Boolean, require: true },
-        nextAlarm: { type: Date, require: true },
-        repeat: { type: ReminderRepeat },
-        daysOfWeek: { type: Array },
-      },
-    },
+    title: { type: String, require: true },
+    description: { type: String, require: true },
+    active: { type: Boolean, require: true },
+    nextAlarm: { type: Date, require: true },
+    repeat: { type: ReminderRepeat },
+    daysOfWeek: { type: Array },
   },
   {
     timestamps: true,
   }
 );
 
-export default model<IUserReminders>("UserReminders", schema);
+const userRemindersSchema = new Schema<IUserReminders>(
+  {
+    userId: { type: String, require: true },
+    email: { type: String, require: true },
+    reminders: { type: [reminderSchema] },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export default model<IUserReminders>("UserReminders", userRemindersSchema);

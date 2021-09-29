@@ -10,6 +10,7 @@ import AppError, {
 import jwt from "jsonwebtoken";
 import user, { IUser } from "./../models/user.models";
 import auth, { IUserAuth } from "./../models/user-auth.models";
+import { log } from "../utils/utils";
 
 export const signin = async (req: Request, res: Response, next: any) => {
   try {
@@ -26,6 +27,7 @@ export const signin = async (req: Request, res: Response, next: any) => {
 
     return res.status(401).json(new AppError(INVALID_CREDENTIALS, 401));
   } catch (e: any) {
+    log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
   }
 };
@@ -69,7 +71,7 @@ export const signup = async (req: Request, res: Response, next: any) => {
     await deleteUserCompletlyFromDatabasesByEmail(email);
     return res.status(400).json(new AppError(ERROR_SIGNUP, 400));
   } catch (e: any) {
-    console.log("exception: ", e);
+    log("ERROR: ", e.message);
     // Ensuring that no user is persisted if the method get an error
     await deleteUserCompletlyFromDatabasesByEmail(req.body.email as string);
     return res.status(500).json(new AppError(e.message, 500));

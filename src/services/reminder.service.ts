@@ -10,6 +10,7 @@ import AppError, {
   REMINDERS_NOT_FOUND,
 } from "../errors/app-error";
 import reminder, { IReminder, IUserReminders } from "../models/reminder.models";
+import { log } from "./../utils/utils";
 
 export const getAllRemindersByUserId = async (
   req: Request,
@@ -34,6 +35,7 @@ export const getAllRemindersByUserId = async (
     }
     return res.status(400).json(new AppError(REMINDERS_NOT_FOUND, 400));
   } catch (e: any) {
+    log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
   }
 };
@@ -62,6 +64,7 @@ export const getAllRemindersByUserEmail = async (
     }
     return res.status(400).json(new AppError(REMINDERS_NOT_FOUND, 400));
   } catch (e: any) {
+    log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
   }
 };
@@ -78,15 +81,16 @@ export const createReminder = async (
     if (!email || !reminderToCreate)
       return res.status(400).json(new AppError(INVALID_REQUEST, 400));
 
-    const remindersFound: IUserReminders = await reminder
-      .findOne({ email })
-      .lean();
+    const docFound: IUserReminders = await reminder.findOne({ email }).lean();
 
-    if (remindersFound) {
-      let remindersList: IReminder[] = remindersFound.reminders;
+    let remindersList: IReminder[];
 
-      if (!remindersList) remindersList = [reminderToCreate];
-      else remindersList.push(reminderToCreate);
+    if (docFound) {
+      if (!docFound.reminders) remindersList = [reminderToCreate];
+      else {
+        remindersList = docFound.reminders;
+        remindersList.push(reminderToCreate);
+      }
 
       const remindersUpdated: IUserReminders = await reminder
         .findOneAndUpdate(
@@ -98,11 +102,22 @@ export const createReminder = async (
         )
         .lean();
 
-      if (remindersUpdated)
+      if (remindersUpdated) {
         return res.status(200).json(remindersUpdated.reminders);
+      }
+    } else {
+      remindersList = [reminderToCreate];
+      const remindersCreated = await reminder.create({
+        email,
+        reminders: remindersList,
+      });
+
+      return res.status(200).json(remindersCreated.reminders);
     }
+
     return res.status(400).json(new AppError(ERROR_CREATE_REMINDER, 400));
   } catch (e: any) {
+    log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
   }
 };
@@ -150,6 +165,7 @@ export const updateReminder = async (
     }
     return res.status(400).json(new AppError(ERROR_UPDATE_REMINDER, 400));
   } catch (e: any) {
+    log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
   }
 };
@@ -171,10 +187,11 @@ export const deleteReminder = async (
       .lean();
 
     if (remindersFound) {
-      let remindersList: IReminder[] = remindersFound.reminders;
+      if (!remindersFound.reminders)
+        return res.status(400).json(new AppError(ERROR_DELETE_REMINDER, 400));
 
-      remindersList = remindersList.filter((r) => {
-        return r._id !== reminderToDelete._id;
+      let remindersList: IReminder[] = remindersFound.reminders.filter((r) => {
+        return r._id != reminderToDelete._id;
       });
 
       const remindersUpdated: IUserReminders = await reminder
@@ -192,6 +209,7 @@ export const deleteReminder = async (
     }
     return res.status(400).json(new AppError(ERROR_DELETE_REMINDER, 400));
   } catch (e: any) {
+    log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
   }
 };
