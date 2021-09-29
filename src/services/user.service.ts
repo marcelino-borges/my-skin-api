@@ -79,7 +79,7 @@ export const signup = async (req: Request, res: Response, next: any) => {
 };
 
 export const verifyJWT = (req: Request, res: Response, next: any) => {
-  const token = req.headers["api-token"] as string;
+  const token = req.headers["Authorization"] as string;
   const secret = process.env.API_KEY;
   if (!secret) return res.status(500).json(new AppError(INTERNAL_ERROR, 500));
   if (!token) return res.status(401).json(new AppError(NO_TOKEN_PROVIDED, 401));
