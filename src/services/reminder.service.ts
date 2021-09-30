@@ -176,10 +176,10 @@ export const deleteReminder = async (
   next: any
 ) => {
   try {
-    const email: string = req.body.email as string;
-    const reminderToDelete: IReminder = req.body.reminder as IReminder;
+    const email: string = req.query.userEmail as string;
+    const idReminderToDelete: string = req.query.reminderId as string;
 
-    if (!email || !reminderToDelete)
+    if (!email || !idReminderToDelete)
       return res.status(400).json(new AppError(INVALID_REQUEST, 400));
 
     const remindersFound: IUserReminders = await reminder
@@ -191,7 +191,7 @@ export const deleteReminder = async (
         return res.status(400).json(new AppError(ERROR_DELETE_REMINDER, 400));
 
       let remindersList: IReminder[] = remindersFound.reminders.filter((r) => {
-        return r._id != reminderToDelete._id;
+        return r._id != idReminderToDelete;
       });
 
       const remindersUpdated: IUserReminders = await reminder
