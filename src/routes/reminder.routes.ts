@@ -1,16 +1,16 @@
 import * as express from "express";
 import * as reminderController from "../controllers/reminder.controller";
-import { verifyJWT } from "../services/user.service";
+import { verifyApiToken } from "../services/user.service";
 
 const reminderRouter = express.Router();
 
 reminderRouter.get(
   "/all",
-  verifyJWT,
+  verifyApiToken,
   reminderController.getAllRemindersByQuery
 );
-reminderRouter.post("/", verifyJWT, reminderController.createReminder);
-reminderRouter.put("/", verifyJWT, reminderController.updateReminder);
-reminderRouter.delete("/", verifyJWT, reminderController.deleteReminder);
+reminderRouter.post("/", verifyApiToken, reminderController.createReminder);
+reminderRouter.put("/", verifyApiToken, reminderController.updateReminder);
+reminderRouter.delete("/", verifyApiToken, reminderController.deleteReminder);
 
 export default reminderRouter;

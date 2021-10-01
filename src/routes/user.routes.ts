@@ -1,10 +1,10 @@
 import * as express from "express";
-import { verifyJWT } from "../services/user.service";
+import { verifyApiToken } from "../services/user.service";
 import * as userController from "./../controllers/user.controller";
 
 const userRouter = express.Router();
 
-userRouter.post("/signin", verifyJWT, userController.signin);
-userRouter.post("/signup", verifyJWT, userController.signup);
+userRouter.post("/signin", verifyApiToken, userController.signin);
+userRouter.post("/signup", verifyApiToken, userController.signup);
 
 export default userRouter;

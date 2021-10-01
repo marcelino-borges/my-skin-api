@@ -71,13 +71,14 @@ export const signup = async (req: Request, res: Response, next: any) => {
   }
 };
 
-export const verifyJWT = (req: Request, res: Response, next: any) => {
-  const token = req.headers["api-key"] as string;
+export const verifyApiToken = (req: Request, res: Response, next: any) => {
+  const tokenSent = req.headers["api-key"] as string;
   const apiKey = process.env.API_KEY;
-  if (!apiKey) return res.status(500).json(new AppError(INTERNAL_ERROR, 500));
-  if (!token) return res.status(401).json(new AppError(NO_TOKEN_PROVIDED, 401));
 
-  if (token !== apiKey)
+  if (!apiKey) return res.status(500).json(new AppError(INTERNAL_ERROR, 500));
+  if (!tokenSent)
+    return res.status(401).json(new AppError(NO_TOKEN_PROVIDED, 401));
+  if (tokenSent !== apiKey)
     return res.status(401).json(new AppError(NOT_AUTHORIZED, 401));
   else next();
 };
