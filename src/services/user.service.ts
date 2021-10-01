@@ -5,6 +5,7 @@ import AppError, {
   FAIL_AUTH_TOKEN,
   INTERNAL_ERROR,
   INVALID_CREDENTIALS,
+  NOT_AUTHORIZED,
   NO_TOKEN_PROVIDED,
 } from "./../errors/app-error";
 import jwt from "jsonwebtoken";
@@ -20,12 +21,11 @@ export const signin = async (req: Request, res: Response, next: any) => {
     if (!email && !password)
       return res.status(400).json(new AppError(INVALID_CREDENTIALS, 400));
 
-    const generatedTokenAndUser = await generateJwtToken(email, password);
+    const userFound = await checkCredentialsAndGetUser(email, password);
 
-    if (generatedTokenAndUser)
-      return res.status(200).json(generatedTokenAndUser);
+    if (userFound) return res.status(200).json(userFound);
 
-    return res.status(401).json(new AppError(INVALID_CREDENTIALS, 401));
+    return res.status(401).json(new AppError(NOT_AUTHORIZED, 401));
   } catch (e: any) {
     log("ERROR: ", e.message);
     return res.status(500).json(new AppError(e.message, 500));
@@ -58,14 +58,7 @@ export const signup = async (req: Request, res: Response, next: any) => {
 
     if (authCreated) {
       const userCreated = await user.create(newUser);
-      const generatedTokenAndUser = await generateJwtToken(
-        newUser.email,
-        password
-      );
-
-      if (userCreated && generatedTokenAndUser) {
-        return res.status(200).json(generatedTokenAndUser);
-      }
+      if (userCreated) return res.status(200).json(userCreated);
     }
     // Ensuring that no user is persisted if the method get an error
     await deleteUserCompletlyFromDatabasesByEmail(email);
@@ -80,36 +73,28 @@ export const signup = async (req: Request, res: Response, next: any) => {
 
 export const verifyJWT = (req: Request, res: Response, next: any) => {
   const token = req.headers["Authorization"] as string;
-  const secret = process.env.API_KEY;
-  if (!secret) return res.status(500).json(new AppError(INTERNAL_ERROR, 500));
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) return res.status(500).json(new AppError(INTERNAL_ERROR, 500));
   if (!token) return res.status(401).json(new AppError(NO_TOKEN_PROVIDED, 401));
 
-  jwt.verify(token, secret, function (err, decoded) {
-    if (err) return res.status(500).json(new AppError(FAIL_AUTH_TOKEN, 500));
-    next();
-  });
+  if (token !== apiKey)
+    return res.status(401).json(new AppError(NOT_AUTHORIZED, 401));
+  else next();
 };
 
-const generateJwtToken = async (email: string, password: string) => {
-  let userFound: IUserAuth = await auth
+const checkCredentialsAndGetUser = async (email: string, password: string) => {
+  let userAuthFound: IUserAuth = await auth
     .findOne({
       $and: [{ email: email }, { password: password }],
     })
     .lean();
 
-  if (userFound) {
-    const userId = userFound._id;
-    const secret = process.env.API_KEY;
-    if (userId && secret) {
-      const token = jwt.sign({ id: userId }, secret, {
-        expiresIn: 1800, // expires in 30min
-      });
-      const userData: IUser = await user
-        .findOne({ email: userFound.email })
-        .lean();
+  if (userAuthFound) {
+    const userFound: IUser = await user
+      .findOne({ email: userAuthFound.email })
+      .lean();
 
-      if (token && userData) return { token: token, user: userData };
-    }
+    if (userFound) return userFound;
   }
   return null;
 };
